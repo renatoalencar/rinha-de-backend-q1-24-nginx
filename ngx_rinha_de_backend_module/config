@@ -1,0 +1,16 @@
+ngx_addon_name=ngx_rinha_de_backend_module
+
+if test -n "$ngx_module_link"; then
+    # The New Way
+    ngx_module_type=HTTP
+    ngx_module_name=ngx_rinha_de_backend_module
+    ngx_module_srcs="$ngx_addon_dir/ngx_rinha_de_backend_module.c"
+    ngx_module_libs="`pkg-config --libs jansson` -L/opt/homebrew/Cellar/libpq/16.2/lib -lpq"
+    ngx_module_incs="`pkg-config --cflags jansson | sed -n -e 's/.*-I *\([^ ][^ ]*\).*/\1/p'` /opt/homebrew/Cellar/libpq/16.2/include"
+
+    . auto/module
+else
+    # The Old Way
+    HTTP_MODULES="$HTTP_MODULES ngx_rinha_de_backend_module"
+    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_rinha_de_backend_module.c"
+fi

@@ -5,6 +5,8 @@
 #include <jansson.h>
 #include <libpq-fe.h>
 
+static char postgres_database_connection[512];
+
 enum rinha_status_t {
     RINHA_OK,
     RINHA_BIZ_ERROR,
@@ -109,6 +111,8 @@ ngx_int_t ngx_http_respond_json(ngx_http_request_t *req, json_t *response) {
 
     req->headers_out.status = NGX_HTTP_OK;
     req->headers_out.content_length_n = length = strlen(output);
+    req->headers_out.content_type.data = (u_char *) "application/json";
+    req->headers_out.content_type.len = 16;
     ngx_http_send_header(req);
 
     buf = ngx_calloc_buf(req->pool);
@@ -174,7 +178,7 @@ static ngx_int_t ngx_rinha_de_backend_extrato_handler(ngx_http_request_t *req) {
     ngx_str_t customer_id;
     rinha_get_customer_id(req, &customer_id);
 
-    conn = PQconnectdb("user=postgres password=123456 host=localhost");
+    conn = PQconnectdb(postgres_database_connection);
     if (PQstatus(conn) != CONNECTION_OK) {
         fprintf(stderr, "Connection to database failed: %s",
                 PQerrorMessage(conn));
@@ -326,7 +330,7 @@ enum rinha_status_t rinha_transact_for_customer(
     char query_params_buffer[4][10];
     const char *query_params[4];
 
-    conn = PQconnectdb("user=postgres password=123456 host=localhost");
+    conn = PQconnectdb(postgres_database_connection);
     if (PQstatus(conn) != CONNECTION_OK) {
         fprintf(stderr, "Connection to database failed: %s",
                 PQerrorMessage(conn));
@@ -498,6 +502,9 @@ static char *ngx_rinha_de_backend_extrato(ngx_conf_t *cf, ngx_command_t *cmd, vo
     ngx_http_core_loc_conf_t *clcf;
     clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
     clcf->handler = ngx_rinha_de_backend_extrato_handler;
+
+    strncpy(postgres_database_connection, getenv("POSTGRES_DATABASE_CONNECTION"), 512);
+
     return NGX_CONF_OK;
 }
 
@@ -505,5 +512,8 @@ static char *ngx_rinha_de_backend_transacao(ngx_conf_t *cf, ngx_command_t *cmd, 
     ngx_http_core_loc_conf_t *clcf;
     clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
     clcf->handler = ngx_rinha_de_backend_transacao_handler;
+
+    strncpy(postgres_database_connection, getenv("POSTGRES_DATABASE_CONNECTION"), 512);
+
     return NGX_CONF_OK;
 }

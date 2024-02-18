@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "ngx_auto_headers.h": "c",
+        "ngx_event.h": "c",
+        "ngx_core.h": "c",
+        "*.c ": "c",
+        "array": "c",
+        "vector": "c",
+        "string": "c",
+        "string_view": "c",
+        "ios": "cpp",
+        "__locale": "c",
+        "ctime": "c",
+        "jansson.h": "c",
+        "libpq-fe.h": "c",
+        "postgres_ext.h": "c",
+        "ngx_atomic.h": "c"
+    }
+}

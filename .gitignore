@@ -1,2 +1,3 @@
 compile_commands.json
 logs/*.log
+*_temp

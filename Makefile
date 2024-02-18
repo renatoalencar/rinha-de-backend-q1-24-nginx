@@ -1,27 +1,15 @@
+INTERCEPT_BUILD := intercept-build
 
-default:	build
+default:	./nginx/objs/nginx
 
-clean:
-	rm -rf Makefile objs
+./nginx/Makefile:
+	cd nginx; ${INTERCEPT_BUILD} ./auto/configure \
+		--add-module=../ngx_rinha_de_backend_module \
+		--with-debug
 
-.PHONY:	default clean
+./nginx/objs/nginx:	./nginx/Makefile
+	cd nginx; ${INTERCEPT_BUILD} make -j
 
-build:
-	$(MAKE) -f objs/Makefile
-
-install:
-	$(MAKE) -f objs/Makefile install
-
-modules:
-	$(MAKE) -f objs/Makefile modules
-
-upgrade:
-	/usr/local/nginx/sbin/nginx -t
-
-	kill -USR2 `cat /usr/local/nginx/logs/nginx.pid`
-	sleep 1
-	test -f /usr/local/nginx/logs/nginx.pid.oldbin
-
-	kill -QUIT `cat /usr/local/nginx/logs/nginx.pid.oldbin`
-
-.PHONY:	build install modules upgrade
+start:	./nginx/objs/nginx
+	cp ./nginx/compile_commands.json .
+	./nginx/objs/nginx -p ./ -c ./nginx.conf

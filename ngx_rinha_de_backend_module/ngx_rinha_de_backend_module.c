@@ -456,12 +456,12 @@ static ngx_int_t ngx_rinha_de_backend_transacao_handler(ngx_http_request_t *req)
     if (rinha_get_customer_id(req, &customer_id) <= 0) {
         ngx_http_finalize_request(req, NGX_HTTP_NOT_FOUND);
         return NGX_OK;
-    };
+    }
 
     if (rinha_read_tx_input(req, &tx) < 0) {
         ngx_http_finalize_request(req, 422);
         return NGX_OK;
-    };
+    }
 
     status = rinha_transact_for_customer(&customer_id, &tx, &output);
     switch (status) {
